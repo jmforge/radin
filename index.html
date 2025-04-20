@@ -6,7 +6,8 @@
   <title>Radar Intolerancias</title>
   <link rel="stylesheet" href="styles.css">
 
-  <script src="https://unpkg.com/html5-qrcode"></script>
+  <!--<script src="https://unpkg.com/html5-qrcode"></script>-->
+  <script src="https://unpkg.com/@zxing/library@latest"></script>
 </head>
 <body>
   <header class="main-header">
@@ -27,12 +28,14 @@
       <input type="text" id="codigoInput" placeholder="Introduce el código de barras">
       <button onclick="buscarProducto()">Buscar</button>
       <button type="button" onclick="iniciarEscaneo()">Escanear</button>
-      <button type="button" onclick="cambiarCamara()" id="cambiarCamaraBtn" class="hidden">🔄 Cambiar cámara</button>
-      a
+      <button type="button" onclick="cambiarCamara()" id="cambiarCamaraBtn" class="hidden">Cambiar cámara</button>
     </div>
 
       <!-- Contenedor del escáner -->
-      <div id="scanner" class="hidden"></div> 
+      <!--<div id="scanner" class="hidden"></div> -->
+      <div id="scanner" class="hidden">
+        <video id="video" width="300" height="200" style="border: 1px solid gray;"></video>
+      </div>
 
     <h2 id="tituloResultado" class="hidden">Resultado</h2>
     <div id="resultado" class="hidden"></div>

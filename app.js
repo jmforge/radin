@@ -186,7 +186,7 @@ async function buscarProducto() {
   }
 }
 
-let escanerActivo = false;
+/*let escanerActivo = false;
 let camaras = [];
 let camaraActual = 0;
 let html5QrCode;
@@ -252,4 +252,94 @@ function detenerEscaneo() {
     document.getElementById("scanner").classList.add("hidden");
     document.getElementById("cambiarCamaraBtn").classList.add("hidden");
   });
+}*/
+
+// Asegúrate de que ZXing esté disponible
+const ZXing = window.ZXing;
+
+// Variables para controlar el escaneo
+let escanerActivo = false;
+let lectorCodigo;
+let dispositivosVideo = [];
+let indiceCamaraActual = 0;
+
+// Función para iniciar el escaneo
+function iniciarEscaneo() {
+  if (escanerActivo) return;
+
+  escanerActivo = true;
+  lectorCodigo = new ZXing.BrowserMultiFormatReader();
+
+  // Obtener dispositivos de video disponibles
+  lectorCodigo.listVideoInputDevices()
+    .then((videoInputDevices) => {
+      dispositivosVideo = videoInputDevices;
+
+      if (dispositivosVideo.length === 0) {
+        alert("No se encontraron cámaras disponibles.");
+        escanerActivo = false;
+        return;
+      }
+
+      // Seleccionar la cámara trasera si está disponible
+      const camaraTrasera = dispositivosVideo.find(device => device.label.toLowerCase().includes('back')) || dispositivosVideo[0];
+      indiceCamaraActual = dispositivosVideo.indexOf(camaraTrasera);
+
+      // Iniciar el escaneo con la cámara seleccionada
+      lectorCodigo.decodeFromVideoDevice(camaraTrasera.deviceId, 'video', (resultado, error) => {
+        if (resultado) {
+          // Código escaneado exitosamente
+          document.getElementById("codigoInput").value = resultado.text;
+          detenerEscaneo();
+          buscarProducto(); // Ejecutar la búsqueda automáticamente
+        }
+
+        if (error && !(error instanceof ZXing.NotFoundException)) {
+          console.error("Error al escanear:", error);
+        }
+      });
+
+      // Mostrar el contenedor del video
+      document.getElementById("scanner").classList.remove("hidden");
+      document.getElementById("cambiarCamaraBtn").classList.remove("hidden");
+    })
+    .catch((err) => {
+      console.error("Error al acceder a las cámaras:", err);
+      escanerActivo = false;
+    });
+}
+
+// Función para cambiar de cámara
+function cambiarCamara() {
+  if (dispositivosVideo.length <= 1) return;
+
+  // Detener el escaneo actual
+  lectorCodigo.reset();
+
+  // Cambiar al siguiente dispositivo de video
+  indiceCamaraActual = (indiceCamaraActual + 1) % dispositivosVideo.length;
+  const nuevoDispositivo = dispositivosVideo[indiceCamaraActual];
+
+  // Iniciar el escaneo con la nueva cámara
+  lectorCodigo.decodeFromVideoDevice(nuevoDispositivo.deviceId, 'video', (resultado, error) => {
+    if (resultado) {
+      document.getElementById("codigoInput").value = resultado.text;
+      detenerEscaneo();
+      buscarProducto();
+    }
+
+    if (error && !(error instanceof ZXing.NotFoundException)) {
+      console.error("Error al escanear:", error);
+    }
+  });
+}
+
+// Función para detener el escaneo
+function detenerEscaneo() {
+  if (lectorCodigo) {
+    lectorCodigo.reset();
+  }
+  escanerActivo = false;
+  document.getElementById("scanner").classList.add("hidden");
+  document.getElementById("cambiarCamaraBtn").classList.add("hidden");
 }
