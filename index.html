@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Radar Intolerancias</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+  <header class="main-header">
+    <h1>🛡️ RadIn: Radar de Intolerancias</h1>
+    <p>Selecciona tus alérgenos y escanea productos para saber si son seguros para ti</p>
+  </header>
+
+  <div class="panel">
+    <button id="toggleBtn" class="toggle-btn">Mis Alérgenos</button>
+    <div id="alergenosForm" class="hidden">
+      <!-- Checkboxes generados dinámicamente -->
+    </div>
+  </div>
+
+  <div class="busqueda-container">
+    <h2>Buscar producto</h2>
+    <div class="busqueda-form">
+      <input type="text" id="codigoInput" placeholder="Introduce el código de barras">
+      <button onclick="buscarProducto()">Buscar</button>
+      <button type="button" onclick="iniciarEscaneo()">Escanear</button>
+    </div>
+
+      <!-- Contenedor del escáner -->
+      <div id="scanner" class="hidden"></div> 
+
+    <h2 id="tituloResultado" class="hidden">Resultado</h2>
+    <div id="resultado" class="hidden"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
