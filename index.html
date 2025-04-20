@@ -12,7 +12,6 @@
   <header class="main-header">
     <h1>🛡️ RadIn: Radar de Intolerancias</h1>
     <p>Selecciona tus alérgenos y escanea productos para saber si son seguros para ti</p>
-    aaa
   </header>
 
   <div class="panel">
@@ -28,6 +27,7 @@
       <input type="text" id="codigoInput" placeholder="Introduce el código de barras">
       <button onclick="buscarProducto()">Buscar</button>
       <button type="button" onclick="iniciarEscaneo()">Escanear</button>
+      <button type="button" onclick="cambiarCamara()" id="cambiarCamaraBtn" class="hidden">🔄 Cambiar cámara</button>
     </div>
 
       <!-- Contenedor del escáner -->

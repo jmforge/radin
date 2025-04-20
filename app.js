@@ -187,41 +187,69 @@ async function buscarProducto() {
 }
 
 let escanerActivo = false;
-const scannerDiv = document.getElementById("scanner");
+let camaras = [];
+let camaraActual = 0;
+let html5QrCode;
 
 function iniciarEscaneo() {
   if (escanerActivo) return;
 
   escanerActivo = true;
-  scannerDiv.classList.remove("hidden");
+  document.getElementById("scanner").classList.remove("hidden");
+  document.getElementById("cambiarCamaraBtn").classList.remove("hidden");
 
-  const html5QrCode = new Html5Qrcode("scanner");
+  html5QrCode = new Html5Qrcode("scanner");
 
   Html5Qrcode.getCameras().then(devices => {
-    if (devices && devices.length) {
-      const backCamera = devices.find(device => device.label.toLowerCase().includes("back")) || devices[0];
-  
-      const cameraId = backCamera.id;
-  
-      html5QrCode.start(
-        cameraId,
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 150 }
-        },
-        (decodedText) => {
-          document.getElementById("codigoInput").value = decodedText;
-          html5QrCode.stop().then(() => {
-            scannerDiv.innerHTML = "";
-            scannerDiv.classList.add("hidden");
-            escanerActivo = false;
-            buscarProducto(); // Opcional: lanzar búsqueda automáticamente
-          });
-        },
-        (errorMessage) => {
-          // puedes mostrar errores si deseas
-        }
-      );
+    if (!devices || devices.length === 0) {
+      alert("No se encontraron cámaras.");
+      return;
     }
+
+    camaras = devices;
+
+    // Selecciona por defecto la trasera si está disponible
+    const backCamIndex = camaras.findIndex(c => c.label.toLowerCase().includes("back"));
+    camaraActual = backCamIndex !== -1 ? backCamIndex : 0;
+
+    iniciarConCamara(camaras[camaraActual].id);
+  }).catch(err => {
+    console.error("Error al acceder a cámaras:", err);
+  });
+}
+
+function iniciarConCamara(camaraId) {
+  html5QrCode.start(
+    camaraId,
+    {
+      fps: 10,
+      qrbox: { width: 250, height: 150 }
+    },
+    (decodedText) => {
+      document.getElementById("codigoInput").value = decodedText;
+      detenerEscaneo();
+      buscarProducto(); // Ejecutar búsqueda automáticamente
+    },
+    (errorMessage) => {
+      // opcional: puedes mostrar errores
+    }
+  );
+}
+
+function cambiarCamara() {
+  if (camaras.length <= 1) return;
+
+  html5QrCode.stop().then(() => {
+    camaraActual = (camaraActual + 1) % camaras.length;
+    iniciarConCamara(camaras[camaraActual].id);
+  });
+}
+
+function detenerEscaneo() {
+  html5QrCode.stop().then(() => {
+    escanerActivo = false;
+    document.getElementById("scanner").innerHTML = "";
+    document.getElementById("scanner").classList.add("hidden");
+    document.getElementById("cambiarCamaraBtn").classList.add("hidden");
   });
 }
