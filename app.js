@@ -199,8 +199,10 @@ function iniciarEscaneo() {
 
   Html5Qrcode.getCameras().then(devices => {
     if (devices && devices.length) {
-      const cameraId = devices[0].id;
-
+      const backCamera = devices.find(device => device.label.toLowerCase().includes("back")) || devices[0];
+  
+      const cameraId = backCamera.id;
+  
       html5QrCode.start(
         cameraId,
         {
@@ -213,15 +215,13 @@ function iniciarEscaneo() {
             scannerDiv.innerHTML = "";
             scannerDiv.classList.add("hidden");
             escanerActivo = false;
-            buscarProducto(); // Autoejecuta la búsqueda
+            buscarProducto(); // Opcional: lanzar búsqueda automáticamente
           });
         },
         (errorMessage) => {
-          // Opcional: puedes mostrar errores de lectura aquí
+          // puedes mostrar errores si deseas
         }
       );
     }
-  }).catch(err => {
-    console.error("No se pudo acceder a la cámara: ", err);
   });
 }
